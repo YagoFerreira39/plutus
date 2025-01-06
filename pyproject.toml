@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "plutus"
+version = "0.1.0"
+description = ""
+authors = ["Yago Ferreira <yagojj@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+witch-doctor = "^1.2.0"
+meeseeks-singleton = "^0.4.4"
+loglifos = "^0.2.1"
+pyfiglet = "^1.0.2"
+fastapi = "^0.115.6"
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
+python-decouple = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
