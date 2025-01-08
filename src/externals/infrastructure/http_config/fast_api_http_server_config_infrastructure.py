@@ -5,6 +5,8 @@ from src.externals.ports.infrastructures.http_config.i_http_server_config_infras
 )
 from starlette.middleware.cors import CORSMiddleware
 
+from src.externals.routers.plutus_router import PlutusRouter
+
 
 class FastApiHttpServerConfigInfrastructure(IHttpServerConfigInfrastructure):
     def __init__(self):
@@ -28,7 +30,9 @@ class FastApiHttpServerConfigInfrastructure(IHttpServerConfigInfrastructure):
         )
 
     def __plutus_router(self):
-        pass
+        plutus_router = PlutusRouter.get_router()
+
+        self.__app.include_router(plutus_router, prefix=self.__root)
 
     def config_http_server(self) -> FastAPI:
         self.__register_cors_rules()
