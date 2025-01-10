@@ -13,6 +13,7 @@ class BillingDataEntity:
     __debt_amount: float
     __debt_due_date: DateEntity
     __debt_id: IdEntity
+    __status: str
 
     def __init__(
         self,
@@ -22,6 +23,7 @@ class BillingDataEntity:
         debt_amount: float,
         debt_due_date: datetime,
         debt_id: IdEntity,
+        status: str = None,
     ):
         self.__name = name
         self.__government_id = government_id
@@ -29,6 +31,7 @@ class BillingDataEntity:
         self.__debt_amount = debt_amount
         self.__debt_due_date = debt_due_date
         self.__debtId = debt_id
+        self.__status = status if status else "processed"
 
     @property
     def name(self) -> str:
@@ -53,3 +56,7 @@ class BillingDataEntity:
     @property
     def debt_id(self) -> str:
         return self.__debtId.value
+
+    @property
+    def status(self) -> str:
+        return self.__status

@@ -30,7 +30,6 @@ class BillingDataModel:
 
     def to_insert(self) -> dict:
         model_to_insert = self.__as_dict()
-        model_to_insert["order_id"] = self.billing_id
         model_to_insert["created_at"] = datetime.datetime.strftime(
             datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"
         )

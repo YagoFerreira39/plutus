@@ -22,7 +22,7 @@ class BaseControllerExtension(IBaseControllerExtension):
         encoded_api_response = jsonable_encoder(api_response)
 
         response = JSONResponse(
-            status_code=exception.http_status_code, content=encoded_api_response
+            status_code=exception._http_status_code, content=encoded_api_response
         )
 
         return response
