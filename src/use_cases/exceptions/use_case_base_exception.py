@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from uuid import UUID
 
 from src.domain.exceptions.track_base_exception import TrackBaseException
@@ -8,6 +9,7 @@ from src.use_cases.exceptions.use_case_exceptions_reasons_enum import (
 
 class UseCaseBaseException(TrackBaseException):
     _reason = UseCaseExceptionsReasonsEnum
+    _http_status_code: HTTPStatus
 
     def __init__(
         self,
