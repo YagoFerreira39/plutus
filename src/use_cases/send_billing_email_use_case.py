@@ -67,7 +67,7 @@ class SendBillingEmailUseCase(ISendBillingEmailUseCase):
     async def __get_billing_data_with_pending_status(cls) -> list[BillingDataModel]:
         try:
             model_list = await cls.__billing_data_repository.get_billing_data_by_status(
-                status="pending"
+                status="processed"
             )
 
             return model_list
