@@ -1,3 +1,23 @@
+from src.adapters.extensions.process_billing.process_billing_data_extension import (
+    ProcessBillingDataExtension,
+)
+from src.adapters.ports.infrastructure.mongo_db.i_mongo_db_collection import (
+    IMongoDbCollection,
+)
+from src.adapters.repositories.mongo_db.billing_data_repository import (
+    BillingDataRepository,
+)
+
+from src.externals.infrastructure.mongo_db.mongo_db_collection import MongoDbCollection
+
+from src.externals.infrastructure.mongo_db.mongo_db_infrastructure import (
+    MongoDbInfrastructure,
+)
+
+from src.adapters.ports.infrastructure.mongo_db.i_mongo_db_infrastructure import (
+    IMongoDbInfrastructure,
+)
+
 from src.externals.infrastructure.logs.loglifos_config_infrastructure import (
     LoglifosConfigInfrastructure,
 )
@@ -9,11 +29,38 @@ from src.externals.ports.infrastructures.ioc_container.i_ioc_container import (
 )
 from witch_doctor import WitchDoctor, InjectionType
 
+from src.externals.services.email_service import EmailService
+from src.use_cases.ports.extensions.process_billing.i_process_billing_data_extension import (
+    IProcessBillingDataExtension,
+)
+from src.use_cases.ports.repositories.mongo_db.i_billing_data_repository import (
+    IBillingDataRepository,
+)
+from src.use_cases.ports.services.i_email__service import IEmailService
+from src.use_cases.ports.use_cases.i_process_billing_data_use_case import (
+    IProcessBillingDataUseCase,
+)
+from src.use_cases.ports.use_cases.i_send_billing_email_use_case import (
+    ISendBillingEmailUseCase,
+)
+from src.use_cases.process_billing_data_use_case import ProcessBillingDataUseCase
+from src.use_cases.send_billing_email_use_case import SendBillingEmailUseCase
+
 
 class WitchDoctorContainerConfigInfrastructure(IIocContainerConfigInfrastructure):
     @classmethod
     def __create_use_cases_container(cls):
         use_cases_container = WitchDoctor.container("use_cases")
+
+        use_cases_container(
+            IProcessBillingDataUseCase,
+            ProcessBillingDataUseCase,
+            InjectionType.SINGLETON,
+        )
+
+        use_cases_container(
+            ISendBillingEmailUseCase, SendBillingEmailUseCase, InjectionType.SINGLETON
+        )
 
         return use_cases_container
 
@@ -21,6 +68,12 @@ class WitchDoctorContainerConfigInfrastructure(IIocContainerConfigInfrastructure
     def __create_infrastructures_container(cls):
         infrastructures_container = WitchDoctor.container("infrastructures")
 
+        infrastructures_container(
+            IMongoDbCollection, MongoDbCollection, InjectionType.SINGLETON
+        )
+        infrastructures_container(
+            IMongoDbInfrastructure, MongoDbInfrastructure, InjectionType.SINGLETON
+        )
         infrastructures_container(
             ILogsConfigInfrastructure,
             LoglifosConfigInfrastructure,
@@ -33,17 +86,29 @@ class WitchDoctorContainerConfigInfrastructure(IIocContainerConfigInfrastructure
     def __create_services_container(cls):
         services_container = WitchDoctor.container("services")
 
+        services_container(IEmailService, EmailService, InjectionType.SINGLETON)
+
         return services_container
 
     @classmethod
     def __create_repositories_container(cls):
         repositories_container = WitchDoctor.container("repositories")
 
+        repositories_container(
+            IBillingDataRepository, BillingDataRepository, InjectionType.SINGLETON
+        )
+
         return repositories_container
 
     @classmethod
     def __create_extensions_container(cls):
         extensions_container = WitchDoctor.container("extensions")
+
+        extensions_container(
+            IProcessBillingDataExtension,
+            ProcessBillingDataExtension,
+            InjectionType.SINGLETON,
+        )
 
         return extensions_container
 
