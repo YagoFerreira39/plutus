@@ -43,7 +43,7 @@ class BillingDataRepository(IBillingDataRepository):
         BillingDataRepository.__mongo_db_infrastructure = mongo_db_infrastructure
         BillingDataRepository.__collection = (
             BillingDataRepository.__mongo_db_infrastructure.require_collection(
-                database=config("BILLING_DATA_DATABASE"),
+                database=config("PLUTUS_DATABASE"),
                 collection=config("BILLING_DATA_COLLECTION"),
             )
         )
@@ -60,12 +60,13 @@ class BillingDataRepository(IBillingDataRepository):
         )
 
         try:
+            documents_to_insert = [
+                model.to_insert() for model in billing_data_model_list
+            ]
+
             async with session.start_transaction():
-                async with cls.__collection.with_collection() as rental_collection:
-                    for billing_data_model in billing_data_model_list:
-                        await rental_collection.insert_one(
-                            billing_data_model.to_insert()
-                        )
+                async with cls.__collection.with_collection() as collection:
+                    await collection.insert_many(documents_to_insert)
 
         except MongoDbBaseInfrastructureException as original_exception:
             raise FailToInsertInformationException(
@@ -74,18 +75,31 @@ class BillingDataRepository(IBillingDataRepository):
             ) from original_exception
 
     @classmethod
-    async def get_billing_data_by_id(cls, billing_id: str) -> BillingDataModel:
+    async def get_billing_data_by_debt_ids(
+        cls, debt_ids: list[str]
+    ) -> list[BillingDataModel]:
         try:
             async with cls.__collection.with_collection() as collection:
-                query = {"_id": ObjectId(billing_id)}
+                step = 5000
+                start = 0
+                result_list = []
 
-                if result := await collection.find_one(query):
-                    model = cls.__process_billing_data_extension.from_result_to_model(
-                        result=result
+                for size in range(start, len(debt_ids), step):
+                    debt_ids_to_query = debt_ids[size : size + step]
+
+                    query = {"debt_id": {"$in": debt_ids_to_query}}
+
+                    result = (
+                        await collection.find(query).limit(step).to_list(length=None)
                     )
 
-                    return model
+                    model_list = cls.__process_billing_data_extension.from_result_list_to_model_list(
+                        result_list=result
+                    )
 
+                    result_list.extend(model_list)
+
+                return result_list
         except MongoDbBaseInfrastructureException as original_exception:
             raise FailToRetrieveInformationException(
                 message="Failed to retrieve billing data in database.",

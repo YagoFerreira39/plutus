@@ -13,7 +13,7 @@ class IBillingDataRepository(ABC):
 
     @classmethod
     @abstractmethod
-    async def get_billing_data_by_id(cls, billing_id: str) -> BillingDataModel:
+    async def get_billing_data_by_debt_ids(cls, debt_ids: list[str]) -> list[BillingDataModel]:
         pass
 
     @classmethod
